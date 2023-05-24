@@ -6,18 +6,34 @@ import * as AWS from '../../../../aws';
 const router: Router = Router();
 
 // Get all feed items
-router.get('/', async (req: Request, res: Response) => {
-    const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
-    items.rows.map((item) => {
+router.get('/', 
+    requireAuth,
+    async (req: Request, res: Response) => {
+        const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
+        items.rows.map((item) => {
             if(item.url) {
                 item.url = AWS.getGetSignedUrl(item.url);
             }
-    });
+        });
     res.send(items);
-});
+    });
 
-//@TODO
-//Add an endpoint to GET a specific resource by Primary Key
+
+router.get('/:id', async (req: Request, res: Response) => {
+    const resourceId = parseInt(req.params.id, 10);
+    const resource = await FeedItem.findByPk(resourceId);
+  
+    if (!resource){
+        return res.status(404).send({message: 'Resource not found'});
+    }
+
+    const saved_resource = await resource.save();
+
+    saved_resource.url = AWS.getGetSignedUrl(saved_resource.url);
+    res.status(201).send(saved_resource);
+    
+  });
+
 
 // update a specific resource
 router.patch('/:id', 
