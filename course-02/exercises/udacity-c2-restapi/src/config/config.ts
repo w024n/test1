@@ -14,7 +14,7 @@ export const config = {
   "prod": {
     "username": "",
     "password": "",
-    "database": "udagram_trial",
+    "database": "udagram_test2",
     "host": "",
     "dialect": "postgres"
   },
