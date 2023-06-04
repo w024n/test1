@@ -41,16 +41,24 @@ import { hasUncaughtExceptionCaptureCallback } from 'process';
       return res.status(400).send('Image URL is required');
     }
 
-    const filteredImagePath: string = await filterImageFromURL(imageUrl);
-    
-    res.sendFile(filteredImagePath, {}, (err: Error) => {
-      if (err) {
-        return res.status(500).send('Error sending the filtered image');
-      }
 
-      // Delete the filtered image file from the server
-      deleteLocalFiles([filteredImagePath]);
-    });
+    try {
+      // Call filterImageFromURL(image_url) to filter the image
+      const filteredImagePath: string = await filterImageFromURL(imageUrl);
+  
+      // Return the filtered image file
+      res.sendFile(filteredImagePath, {}, (err: Error) => {
+        if (err) {
+          return res.status(500).send('Error sending the filtered image');
+        }
+  
+        // Delete the filtered image file from the server
+        deleteLocalFiles([filteredImagePath]);
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(422).send('Unable to process the provided image URL');
+    }
   
   });
 
