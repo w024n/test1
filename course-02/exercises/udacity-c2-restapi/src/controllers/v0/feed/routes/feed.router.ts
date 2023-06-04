@@ -7,7 +7,6 @@ const router: Router = Router();
 
 // Get all feed items
 router.get('/', 
-    requireAuth,
     async (req: Request, res: Response) => {
         const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
         items.rows.map((item) => {
